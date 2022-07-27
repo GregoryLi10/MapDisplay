@@ -1,1 +1,1 @@
-# Budget Google Maps Frontend
+# Budget Google Maps Front-end

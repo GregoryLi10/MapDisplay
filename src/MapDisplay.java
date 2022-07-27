@@ -46,6 +46,14 @@ public class MapDisplay {
 		JPanel canvas = new JPanel() {
 			public void paint(Graphics g) {
 				if (img==null) return;
+				if (ix>=width)
+					ix-=width;
+				else if (ix+width+zoom*width/20<=0)
+					ix+=width;
+				if (iy>=height)
+					iy-=height;
+				else if (iy+height+zoom*height/20<=0)
+					iy+=height;
 				if (navigating) {
 					int mxNew=MouseInfo.getPointerInfo().getLocation().x, myNew=MouseInfo.getPointerInfo().getLocation().y;
 					ix+=mxNew-mx;
@@ -55,8 +63,7 @@ public class MapDisplay {
 				}
 				g.setColor(new Color(50,50,50));
 				g.fillRect(0, 0, screensize[0], screensize[1]);
-				g.drawImage(img,ix,iy,width+zoom*width/20,height+zoom*height/20,this);
-//				System.out.println(zoom+" "+(width+zoom*width/20)+" "+(height+zoom*height/20));
+				g.drawImage(img,ix-sx,iy-    sy,width+zoom*width/20,height+zoom*height/20,this);
 			}
 		};
 		canvas.addMouseListener(new MouseListener() {
@@ -91,15 +98,19 @@ public class MapDisplay {
 						return;
 					else if (zoom>=zoomMax&&e.getWheelRotation()>0) 
 						return;
-					sx=width+zoom*width/20-e.getX();
-					sy=height+zoom*height/20-e.getY();
-					System.out.println(e.getX()+" "+e.getY());
-					System.out.println(sx+" "+sy);
+					
+					int ow=width+zoom*width/20, oh=height+zoom*height/20;
+					
 					zoom+=e.getWheelRotation(); // negative = down, positive = up
 					if (zoom<zoomMin)
 						zoom=zoomMin;
 					else if (zoom>zoomMax) 
 						zoom=zoomMax;
+					
+					int nw=width+zoom*width/20, nh=height+zoom*height/20;
+					
+					ix-=(ix+nw-e.getX())-(ix+ow-e.getX())*(nw/(double)ow);
+					iy-=(iy+nh-e.getY())-(iy+oh-e.getY())*(nh/(double)oh);
 				} 
 			}
 			
